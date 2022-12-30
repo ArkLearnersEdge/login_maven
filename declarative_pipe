@@ -1,0 +1,104 @@
+pipeline
+{
+	agent any
+	stages
+	{
+		stage('con down')
+		{
+			steps
+			{
+				script
+				{
+					try
+					{
+						git 'https://github.com/ArkLearnersEdge/maven.git'
+					}
+					catch(Exception e1)
+					{
+						mail bcc: '', body: 'the processes has been failed please reached', cc: 'ark@gmail.com', from: '', replyTo: '', subject: 'CI_CD processes failed', to: 'unis@gmail.com'
+					}
+					
+				}
+			}
+		
+		}
+		stage('con build')
+		{
+			steps
+			{
+				script
+				{
+					try
+					{
+						sh 'mvn package'
+					}
+					catch(Exception e2)
+					{
+						mail bcc: '', body: 'ci-cd failed due to the build to artifact is failed', cc: 'ark@gmail.com', from: '', replyTo: '', subject: 'CI-CD failed', to: 'testing@gmail.com'
+					}
+					
+				}
+			}
+		
+		}
+		stage('con Deploy')
+		{
+			steps
+			{
+				script
+				{
+					try
+					{
+						sh 'scp /home/ubuntu/.jenkins/workspace/dev_trycatch_demo/webapp/target/webapp.war ubuntu@172.31.88.73:/var/lib/tomcat8/webapps/testapp'
+					}
+					catch(Exception e3)
+					{
+						mail bcc: '', body: 'ci-cd failed due to the testing to artifact is failed', cc: 'ark@gmail.com', from: '', replyTo: '', subject: 'CI-CD failed', to: 'testing@gmail.com'
+					}
+					
+				}
+			}
+		
+		}
+		stage('con test')
+		{
+			steps
+			{
+				script
+				{
+					try
+					{
+						git 'https://github.com/ArkLearnersEdge/FunctionalTesting.git'
+						sh 'java -jar /home/ubuntu/.jenkins/workspace/dev_trycatch_demo/testing.jar'
+					}
+					catch(Exception e4)
+					{
+						mail bcc: '', body: 'ci-cd failed due to the testing to artifact is failed', cc: 'ark@gmail.com', from: '', replyTo: '', subject: 'CI-CD failed', to: 'testing@gmail.com'
+					}
+					
+				}
+			}
+		
+		}
+		stage('con Prod')
+		{
+			steps
+			{
+				script
+				{
+					try
+					{
+						sh 'scp /home/ubuntu/.jenkins/workspace/dev_trycatch_demo/webapp/target/webapp.war ubuntu@172.31.86.207:/var/lib/tomcat8/webapps/prod'
+					}
+					catch(Exception e5)
+					{
+						mail bcc: '', body: 'production failed due to ci- cd processes failure ', cc: 'team@gmail.com', from: '', replyTo: '', subject: ' ci- cd processes failure ', to: 'manager@gmail.com'
+					}
+					
+				}
+			}
+		
+		}
+	}
+	
+}
